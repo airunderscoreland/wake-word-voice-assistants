@@ -726,23 +726,9 @@ font:
 text_sensor:
   - id: text_request
     platform: template
-    on_value:
-      lambda: |-
-        if(id(text_request).state.length()>32) {
-          std::string name = id(text_request).state.c_str();
-          std::string truncated = esphome::str_truncate(name.c_str(),31);
-          id(text_request).state = (truncated+"...").c_str();
-        }
 
   - id: text_response
     platform: template
-    on_value:
-      lambda: |-
-        if(id(text_response).state.length()>32) {
-          std::string name = id(text_response).state.c_str();
-          std::string truncated = esphome::str_truncate(name.c_str(),31);
-          id(text_response).state = (truncated+"...").c_str();
-        }
 
 color:
   - id: idle_color
@@ -795,20 +781,47 @@ display:
         lambda: |-
           it.fill(id(thinking_color));
           it.image((it.get_width() / 2), (it.get_height() / 2), id(casita_thinking), ImageAlign::CENTER);
-          it.filled_rectangle(20 , 20 , 280 , 30 , Color::WHITE );
-          it.rectangle(20 , 20 , 280 , 30 , Color::BLACK );
-          it.printf(30, 25, id(font_request), Color::BLACK, "%s", id(text_request).state.c_str());
+          auto wrap = [](const std::string& s, int max_len) -> std::pair<std::string, std::string> {
+            if ((int)s.length() <= max_len) return {s, ""};
+            size_t bp = s.rfind(' ', max_len);
+            if (bp == std::string::npos) bp = max_len;
+            std::string l1 = s.substr(0, bp);
+            std::string rest = s.substr(bp + (s[bp] == ' ' ? 1 : 0));
+            std::string l2 = ((int)rest.length() > max_len) ? rest.substr(0, max_len - 3) + "..." : rest;
+            return {l1, l2};
+          };
+          auto req = wrap(id(text_request).state, 38);
+          it.filled_rectangle(20, 15, 280, 42, Color::WHITE);
+          it.rectangle(20, 15, 280, 42, Color::BLACK);
+          it.printf(30, 20, id(font_request), Color::BLACK, "%s", req.first.c_str());
+          if (!req.second.empty())
+            it.printf(30, 37, id(font_request), Color::BLACK, "%s", req.second.c_str());
           id(draw_timer_timeline).execute();
       - id: replying_page
         lambda: |-
           it.fill(id(replying_color));
           it.image((it.get_width() / 2), (it.get_height() / 2), id(casita_replying), ImageAlign::CENTER);
-          it.filled_rectangle(20 , 20 , 280 , 30 , Color::WHITE );
-          it.rectangle(20 , 20 , 280 , 30 , Color::BLACK );
-          it.filled_rectangle(20 , 190 , 280 , 30 , Color::WHITE );
-          it.rectangle(20 , 190 , 280 , 30 , Color::BLACK );
-          it.printf(30, 25, id(font_request), Color::BLACK, "%s", id(text_request).state.c_str());
-          it.printf(30, 195, id(font_response), Color::BLACK, "%s", id(text_response).state.c_str());
+          auto wrap = [](const std::string& s, int max_len) -> std::pair<std::string, std::string> {
+            if ((int)s.length() <= max_len) return {s, ""};
+            size_t bp = s.rfind(' ', max_len);
+            if (bp == std::string::npos) bp = max_len;
+            std::string l1 = s.substr(0, bp);
+            std::string rest = s.substr(bp + (s[bp] == ' ' ? 1 : 0));
+            std::string l2 = ((int)rest.length() > max_len) ? rest.substr(0, max_len - 3) + "..." : rest;
+            return {l1, l2};
+          };
+          auto req = wrap(id(text_request).state, 38);
+          it.filled_rectangle(20, 15, 280, 42, Color::WHITE);
+          it.rectangle(20, 15, 280, 42, Color::BLACK);
+          it.printf(30, 20, id(font_request), Color::BLACK, "%s", req.first.c_str());
+          if (!req.second.empty())
+            it.printf(30, 37, id(font_request), Color::BLACK, "%s", req.second.c_str());
+          auto res = wrap(id(text_response).state, 38);
+          it.filled_rectangle(20, 178, 280, 42, Color::WHITE);
+          it.rectangle(20, 178, 280, 42, Color::BLACK);
+          it.printf(30, 183, id(font_response), Color::BLACK, "%s", res.first.c_str());
+          if (!res.second.empty())
+            it.printf(30, 200, id(font_response), Color::BLACK, "%s", res.second.c_str());
           id(draw_timer_timeline).execute();
       - id: timer_finished_page
         lambda: |-
