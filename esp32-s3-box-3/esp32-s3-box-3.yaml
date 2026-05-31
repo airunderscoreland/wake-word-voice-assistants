@@ -791,8 +791,9 @@ display:
             return {l1, l2};
           };
           auto req = wrap(id(text_request).state, 38);
-          it.filled_rectangle(20, 15, 280, 42, Color::WHITE);
-          it.rectangle(20, 15, 280, 42, Color::BLACK);
+          int req_height = req.second.empty() ? 24 : 42;
+          it.filled_rectangle(20, 15, 280, req_height, Color::WHITE);
+          it.rectangle(20, 15, 280, req_height, Color::BLACK);
           it.printf(30, 20, id(font_request), Color::BLACK, "%s", req.first.c_str());
           if (!req.second.empty())
             it.printf(30, 37, id(font_request), Color::BLACK, "%s", req.second.c_str());
@@ -811,17 +812,20 @@ display:
             return {l1, l2};
           };
           auto req = wrap(id(text_request).state, 38);
-          it.filled_rectangle(20, 15, 280, 42, Color::WHITE);
-          it.rectangle(20, 15, 280, 42, Color::BLACK);
+          int req_height = req.second.empty() ? 24 : 42;
+          it.filled_rectangle(20, 15, 280, req_height, Color::WHITE);
+          it.rectangle(20, 15, 280, req_height, Color::BLACK);
           it.printf(30, 20, id(font_request), Color::BLACK, "%s", req.first.c_str());
           if (!req.second.empty())
             it.printf(30, 37, id(font_request), Color::BLACK, "%s", req.second.c_str());
           auto res = wrap(id(text_response).state, 38);
-          it.filled_rectangle(20, 178, 280, 42, Color::WHITE);
-          it.rectangle(20, 178, 280, 42, Color::BLACK);
-          it.printf(30, 183, id(font_response), Color::BLACK, "%s", res.first.c_str());
+          int res_height = res.second.empty() ? 24 : 42;
+          int res_y = 220 - res_height;
+          it.filled_rectangle(20, res_y, 280, res_height, Color::WHITE);
+          it.rectangle(20, res_y, 280, res_height, Color::BLACK);
+          it.printf(30, res_y + 5, id(font_response), Color::BLACK, "%s", res.first.c_str());
           if (!res.second.empty())
-            it.printf(30, 200, id(font_response), Color::BLACK, "%s", res.second.c_str());
+            it.printf(30, res_y + 22, id(font_response), Color::BLACK, "%s", res.second.c_str());
           id(draw_timer_timeline).execute();
       - id: timer_finished_page
         lambda: |-
